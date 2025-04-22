@@ -5,7 +5,7 @@
 #include <math.h>
 #define MAXN 1000
 #define ALPHA_LENGTH 26
-#define COMMON_COUNT 10
+#define COMMON_LETTER 10
 
 char* cezar_decipher(char* cipher, int key)
 {
@@ -54,47 +54,50 @@ int read_cipher(char* filename, char* cipher)
 
 int* count_frequencies(char* cipher)
 {
-    int* frequency = (int*) malloc(sizeof(int) * ALPHA_LENGTH);
-    memset(frequency, 0, sizeof(int) * ALPHA_LENGTH);
     int length = strlen(cipher);
+    int* counts = (int*) malloc(sizeof(int) * ALPHA_LENGTH);
+    memset(counts, 0, sizeof(int) * ALPHA_LENGTH);
     for(int i = 0; i < length; i++)
     {
-        int position = tolower(cipher[i]) - 'a';
-        frequency[position]++;
+        char symbol = tolower (cipher[i]);
+        if(symbol >= 'a' && symbol<= 'z')
+            {
+                int position = symbol - 'a';
+                counts[position]++;
+            }
     }
-
-    return frequency;
+    return counts;
 }
 
-int get_max_index(int* frequencies)
+int get_max_index(int * counts)
 {
     int max_index = 0;
     for(int i = 0; i < ALPHA_LENGTH; i++)
     {
-        if(frequencies[i] > frequencies[max_index])
+        if(counts[i] > counts[max_index])
         {
             max_index = i;
         }
     }
+
     return max_index;
 }
-
 int main()
 {
-    char filename[MAXN];
-    scanf("%s", filename);
     char cipher[MAXN];
-    read_cipher(filename, cipher);
-    int* frequencies = count_frequencies(cipher);
-    char max_letter = get_max_index(frequencies) + 'a';
-    char common_letters[COMMON_COUNT] = 
+    read_cipher("cesar.txt", cipher);
+    char common_letters[COMMON_LETTER] = 
         {'e', 't', 'a', 'o', 'i', 'n', 's', 'r', 'h', 'l'};
-    for(int i = 0; i < COMMON_COUNT; i++)
+    int*frequencies = count_frequencies (cipher);
+    char most_common_letter = get_max_index(frequencies) + 'a';
+    for(int i =0; i < COMMON_LETTER; i++)
     {
-        int key = abs(max_letter - common_letters[i]);
+        int key = abs(most_common_letter - common_letters[i]);
         char* plaintext = cezar_decipher(cipher, key);
-        printf("Key = %d, result: %s\n", key, plaintext);
+        printf("Key = %d -> %s\n", key, plaintext);
         free(plaintext);
     }
     return EXIT_SUCCESS;
+
+
 }
